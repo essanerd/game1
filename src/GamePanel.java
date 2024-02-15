@@ -14,13 +14,16 @@ public class GamePanel extends JPanel implements Runnable {
     final int screenWidth = tilesize * maxscreencol;// 768 pixels wide
     final int screenHeight = tilesize * maxscreenrow; // 576 pixels long
 
+    KeyHandler keyH = new KeyHandler();// declaring a new key handler
+
     Thread gameThread;// keeps my programs runing untill i stop it
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));// telling a new dimension
         this.setBackground(Color.black);// setting background color
         this.setDoubleBuffered(true);
-
+        this.addKeyListener(keyH);// so it can recognize the key input
+        this.setFocusable(true);
     }
 
     public void startGameThread() {
@@ -29,7 +32,12 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread.start();// telling the thread to start
     }
 
-    @Override
+    // set player`s default posititon
+    int PlayerX = 100;
+    int PlayerY = 100;
+    int Playerspeed = 4;
+
+
     public void run() {//gamethread caller
 
         while (gameThread != null) {//this is telling java that as long as this thread exist keep running what is in the  curly brackets
@@ -45,13 +53,18 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update() {
+        if ( keyH.upPressed == true) {
+            PlayerY-=Playerspeed;
+            PlayerY = PlayerY - Playerspeed;
+
+        }
     }
 
     public void paintComponent(Graphics g) {// to tell java hey man I want to draw the updated picture
         super.paintComponent(g);// super  is the parent class of this class // cause when ever I type paint component I need this
         Graphics2D g2 = (Graphics2D) g;// has little more functitions than graphics
         g2.setColor(Color.white);// setting color
-        g2.fillRect(100, 100, tilesize, tilesize);// draws a rectangle on the screen
+        g2.fillRect(PlayerX, PlayerY, tilesize, tilesize);// draws a rectangle on the screen
         g2.dispose();// good practice
 
 
