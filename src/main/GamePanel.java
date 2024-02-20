@@ -1,19 +1,22 @@
+package main;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class GamePanel extends JPanel implements Runnable {
     //screen settings
-    final int originaltilesize = 16;//means 16 by 16 tile = player size npc map tile
+    final int originalTileSize = 16;//means 16 by 16 tile = player size npc map tile
     final int scale = 3;//= 16 * 3 so 48 pixels
 
-    final int tilesize = originaltilesize * scale;//basicaly tile size 48 by 48
+    final int tileSize = originalTileSize * scale;//basicaly tile size 48 by 48
     //so max 16 in a coloum
     final int maxscreencol = 16;
     // so 12 in a row
     final int maxscreenrow = 12;
-    final int screenWidth = tilesize * maxscreencol;// 768 pixels wide
-    final int screenHeight = tilesize * maxscreenrow; // 576 pixels long
-
+    final int screenWidth = tileSize * maxscreencol;// 768 pixels wide
+    final int screenHeight = tileSize * maxscreenrow; // 576 pixels long
+    // fps
+    int FPS = 60;
     KeyHandler keyH = new KeyHandler();// declaring a new key handler
 
     Thread gameThread;// keeps my programs runing untill i stop it
@@ -39,24 +42,51 @@ public class GamePanel extends JPanel implements Runnable {
 
 
     public void run() {//gamethread caller
+        double drawInterval = 1000000000 / FPS;// draw the screen every 0.016666666666666
+        double nextDrawTime = System.nanoTime() + drawInterval;
 
         while (gameThread != null) {//this is telling java that as long as this thread exist keep running what is in the  curly brackets
 
-            //    System.out.println("game loop is running");
+            long currentTime = System.nanoTime();
+            System.out.println("current time:" + currentTime);
 
             // 1 Update : update information such as chararecter infmation
             update();
 
-            // Draw : draw the screen with the updated information
+
             repaint();// how you call the paintcomponent method
+
+
+            try {
+                double remainingTime = nextDrawTime - System.nanoTime();
+                remainingTime = remainingTime / 1000000;
+
+
+                if (remainingTime < 0) {
+                    remainingTime = 0;
+                }
+
+                Thread.sleep((long) remainingTime); // pause`s the game loop untill it`s sleep time is over
+                nextDrawTime += drawInterval;
+
+            } catch (InterruptedException e) {
+                // TODO Auto generated catch block
+                e.printStackTrace();
+            }
+
+
         }
     }
 
     public void update() {
-        if ( keyH.upPressed == true) {
-            PlayerY-=Playerspeed;
-            PlayerY = PlayerY - Playerspeed;
-
+        if (keyH.upPressed == true) {//all  of  these updates player positions
+            PlayerY -= Playerspeed;
+        } else if (keyH.downPressed == true) {
+            PlayerY += Playerspeed;
+        } else if (keyH.leftPressed == true) {
+            PlayerX -= Playerspeed;
+        } else if (keyH.rightPressed == true) {
+            PlayerX += Playerspeed;
         }
     }
 
@@ -64,7 +94,7 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);// super  is the parent class of this class // cause when ever I type paint component I need this
         Graphics2D g2 = (Graphics2D) g;// has little more functitions than graphics
         g2.setColor(Color.white);// setting color
-        g2.fillRect(PlayerX, PlayerY, tilesize, tilesize);// draws a rectangle on the screen
+        g2.fillRect(PlayerX, PlayerY, tileSize, tileSize);// draws a rectangle on the screen
         g2.dispose();// good practice
 
 
